@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     if (automatonCheck(aut, argv[2]) == 1) {
         printf("String '%s' is accepted by the automaton\n", argv[2]);
     } else {
-        printf("String '%s' is not accepted by the automaton\n", argv[2]);
+        printf("String '%s' is NOT accepted by the automaton\n", argv[2]);
     }
 
     parserDestroy(&parser);
