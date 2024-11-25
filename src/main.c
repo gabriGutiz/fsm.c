@@ -17,18 +17,14 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s <filename> <test_string>\n", argv[0]);
         return EXIT_FAILURE;
     }
-
     if (!(fileContent = readFile(argv[1]))) {
         fprintf(stderr, "Error reading file or file is empty");
         return EXIT_FAILURE;
     }
-    printf("File content:\n%s\n", fileContent);
-
     if (!(tokens = tokenize(fileContent, &totalTokens))) {
         fprintf(stderr, "Error tokenizing file content");
         return EXIT_FAILURE;
     }
-    printf("Total tokens: %ld\n", totalTokens);
 
     Parser *parser = parserCreate(tokens);
     Automaton *aut = parserParse(parser);
