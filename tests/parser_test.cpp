@@ -42,15 +42,15 @@ TEST(TestLexer, TestLexer_Complete) {
 
     tests[3] = tokenCreate(TokenSemicolon, NULL);
 
-    tests[4] = tokenCreate(TokenChar, strdup("0"));
+    tests[4] = tokenCreate(TokenIdent, strdup("0"));
     tests[5] = tokenCreate(TokenComma, NULL);
-    tests[6] = tokenCreate(TokenChar, strdup("1"));
+    tests[6] = tokenCreate(TokenIdent, strdup("1"));
 
     tests[7] = tokenCreate(TokenSemicolon, NULL);
 
     tests[8] = tokenCreate(TokenIdent, strdup("s1"));
     tests[9] = tokenCreate(TokenComma, NULL);
-    tests[10] = tokenCreate(TokenChar, strdup("0"));
+    tests[10] = tokenCreate(TokenIdent, strdup("0"));
     tests[11] = tokenCreate(TokenComma, NULL);
     tests[12] = tokenCreate(TokenIdent, strdup("s1"));
 
@@ -58,7 +58,7 @@ TEST(TestLexer, TestLexer_Complete) {
 
     tests[14] = tokenCreate(TokenIdent, strdup("s1"));
     tests[15] = tokenCreate(TokenComma, NULL);
-    tests[16] = tokenCreate(TokenChar, strdup("1"));
+    tests[16] = tokenCreate(TokenIdent, strdup("1"));
     tests[17] = tokenCreate(TokenComma, NULL);
     tests[18] = tokenCreate(TokenIdent, strdup("s2"));
 
@@ -66,7 +66,7 @@ TEST(TestLexer, TestLexer_Complete) {
 
     tests[20] = tokenCreate(TokenIdent, strdup("s2"));
     tests[21] = tokenCreate(TokenComma, NULL);
-    tests[22] = tokenCreate(TokenChar, strdup("0"));
+    tests[22] = tokenCreate(TokenIdent, strdup("0"));
     tests[23] = tokenCreate(TokenComma, NULL);
     tests[24] = tokenCreate(TokenIdent, strdup("s1"));
 
@@ -74,7 +74,7 @@ TEST(TestLexer, TestLexer_Complete) {
 
     tests[26] = tokenCreate(TokenIdent, strdup("s2"));
     tests[27] = tokenCreate(TokenComma, NULL);
-    tests[28] = tokenCreate(TokenChar, strdup("1"));
+    tests[28] = tokenCreate(TokenIdent, strdup("1"));
     tests[29] = tokenCreate(TokenComma, NULL);
     tests[30] = tokenCreate(TokenIdent, strdup("s2"));
 

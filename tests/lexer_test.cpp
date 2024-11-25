@@ -43,15 +43,15 @@ TEST(TestLexer, TestLexer_Complete) {
 
     tests[3] = tokenCreate(TokenSemicolon, NULL, 1, 6, 1);
 
-    tests[4] = tokenCreate(TokenChar, strdup("0"), 1, 7, 1);
+    tests[4] = tokenCreate(TokenIdent, strdup("0"), 1, 7, 1);
     tests[5] = tokenCreate(TokenComma, NULL, 1, 8, 1);
-    tests[6] = tokenCreate(TokenChar, strdup("1"), 1, 9, 1);
+    tests[6] = tokenCreate(TokenIdent, strdup("1"), 1, 9, 1);
 
     tests[7] = tokenCreate(TokenSemicolon, NULL, 1, 10, 1);
 
     tests[8] = tokenCreate(TokenIdent, strdup("s1"), 1, 11, 2);
     tests[9] = tokenCreate(TokenComma, NULL, 1, 13, 1);
-    tests[10] = tokenCreate(TokenChar, strdup("0"), 1, 14, 1);
+    tests[10] = tokenCreate(TokenIdent, strdup("0"), 1, 14, 1);
     tests[11] = tokenCreate(TokenComma, NULL, 1, 15, 1);
     tests[12] = tokenCreate(TokenIdent, strdup("s1"), 1, 16, 2);
 
@@ -59,7 +59,7 @@ TEST(TestLexer, TestLexer_Complete) {
 
     tests[14] = tokenCreate(TokenIdent, strdup("s1"), 1, 19, 2);
     tests[15] = tokenCreate(TokenComma, NULL, 1, 21, 1);
-    tests[16] = tokenCreate(TokenChar, strdup("1"), 1, 22, 1);
+    tests[16] = tokenCreate(TokenIdent, strdup("1"), 1, 22, 1);
     tests[17] = tokenCreate(TokenComma, NULL, 1, 23, 1);
     tests[18] = tokenCreate(TokenIdent, strdup("s2"), 1, 24, 2);
 
@@ -67,7 +67,7 @@ TEST(TestLexer, TestLexer_Complete) {
 
     tests[20] = tokenCreate(TokenIdent, strdup("s2"), 1, 27, 2);
     tests[21] = tokenCreate(TokenComma, NULL, 1, 29, 1);
-    tests[22] = tokenCreate(TokenChar, strdup("0"), 1, 30, 1);
+    tests[22] = tokenCreate(TokenIdent, strdup("0"), 1, 30, 1);
     tests[23] = tokenCreate(TokenComma, NULL, 1, 31, 1);
     tests[24] = tokenCreate(TokenIdent, strdup("s1"), 1, 32, 2);
 
@@ -75,7 +75,7 @@ TEST(TestLexer, TestLexer_Complete) {
 
     tests[26] = tokenCreate(TokenIdent, strdup("s2"), 1, 35, 2);
     tests[27] = tokenCreate(TokenComma, NULL, 1, 37, 1);
-    tests[28] = tokenCreate(TokenChar, strdup("1"), 1, 38, 1);
+    tests[28] = tokenCreate(TokenIdent, strdup("1"), 1, 38, 1);
     tests[29] = tokenCreate(TokenComma, NULL, 1, 39, 1);
     tests[30] = tokenCreate(TokenIdent, strdup("s2"), 1, 40, 2);
 

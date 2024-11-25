@@ -3,7 +3,7 @@
 #include "automaton/automaton.h"
 
 TEST(TestAutomaton, TestAutomaton_One) {
-    Automaton *automaton = automatonCreate();
+    Automaton *automaton = automatonCreate(strdup("One"));
 
     automatonAddState(automaton, strdup("s0"));
     automatonAddState(automaton, strdup("s1"));

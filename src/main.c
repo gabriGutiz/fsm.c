@@ -30,9 +30,9 @@ int main(int argc, char *argv[]) {
     Automaton *aut = parserParse(parser);
 
     if (automatonCheck(aut, argv[2]) == 1) {
-        printf("String '%s' is accepted by the automaton\n", argv[2]);
+        printf("String '%s' is accepted by automaton %s\n", argv[2], automatonGetName(aut));
     } else {
-        printf("String '%s' is NOT accepted by the automaton\n", argv[2]);
+        printf("String '%s' is NOT accepted by automaton %s\n", argv[2], automatonGetName(aut));
     }
 
     parserDestroy(&parser);

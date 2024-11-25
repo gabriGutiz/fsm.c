@@ -15,6 +15,7 @@ typedef struct STransition {
 } Transition;
 
 struct SAutomaton {
+    char *name;
     char *states[MAX_STATES];
     size_t statesCount;
     char alphabet[MAX_ALPHABET];
@@ -37,12 +38,13 @@ int _automatonCountTransitions(Automaton *automaton, char *state, char c);
 *                              PUBLIC FUNCTIONS                              *
 ******************************************************************************/
 
-Automaton *automatonCreate() {
+Automaton *automatonCreate(char *name) {
     size_t len = sizeof(Automaton);
 
     Automaton *automaton = malloc(len);
     memset(automaton, 0, len);
 
+    automaton->name = name;
     automaton->statesCount = 0;
     automaton->alphabetCount = 0;
     automaton->transitionsCount = 0;
@@ -50,6 +52,10 @@ Automaton *automatonCreate() {
     automaton->acceptStatesCount = 0;
 
     return automaton;
+}
+
+char *automatonGetName(Automaton *automaton) {
+    return automaton->name;
 }
 
 void automatonDestroy(Automaton **automaton) {

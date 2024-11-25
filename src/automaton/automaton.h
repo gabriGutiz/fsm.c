@@ -6,7 +6,8 @@ extern "C" {
 #endif
 
 typedef struct SAutomaton Automaton;
-Automaton *automatonCreate();
+Automaton *automatonCreate(char *name);
+char *automatonGetName(Automaton *automaton);
 void automatonDestroy(Automaton **automaton);
 int automatonAddState(Automaton *automaton, char *state);
 int automatonAddToAlphabet(Automaton *automaton, char c);

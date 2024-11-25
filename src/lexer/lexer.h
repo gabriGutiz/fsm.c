@@ -15,8 +15,8 @@ typedef enum {
     TokenComma,
     TokenSemicolon,
     TokenPipe,
-    TokenChar,
     TokenIdent,
+    TokenAssign,
     TokenEof,
     TokenIllegal
 } TokenType;

@@ -78,27 +78,23 @@ Token *lexerNext(Lexer *lexer) {
         case '|':
             tok = tokenCreate(TokenPipe, NULL, lexer->line, lexer->column, 1);
             break;
+        case '=':
+            tok = tokenCreate(TokenAssign, NULL, lexer->line, lexer->column, 1);
+            break;
         case '\0':
             tok = tokenCreate(TokenEof, NULL, lexer->line, lexer->column, 1);
             break;
     }
 
-    if (_isLetter(lexer->ch)) {
+    if (_isLetter(lexer->ch) || _isNumber(lexer->ch)) {
         size_t len = 0;
         char *literal = NULL;
         const char *ident = _lexerReadIdent(lexer, &len);
 
         literal = strndup(ident, len);
 
-        if (len == 1) {
-            tok = tokenCreate(TokenChar, literal, lexer->line, lexer->column - 1, 1);
-        } else {
-            tok = tokenCreate(TokenIdent, literal, lexer->line, lexer->column - len, len);
-        }
+        tok = tokenCreate(TokenIdent, literal, lexer->line, lexer->column - len, len);
         return tok;
-    } else if (_isNumber(lexer->ch)) {
-        char *literal = strndup(lexer->input + lexer->position, 1);
-        tok = tokenCreate(TokenChar, literal, lexer->line, lexer->column, 1);
     }
 
     if (!tok) {
@@ -118,8 +114,6 @@ char *tokenTypeToString(TokenType type) {
             return strdup("EOF");
         case TokenIdent:
             return strdup("IDENT");
-        case TokenChar:
-            return strdup("CHAR");
         case TokenLParen:
             return strdup("LPAREN");
         case TokenRParen:
@@ -134,6 +128,8 @@ char *tokenTypeToString(TokenType type) {
             return strdup("SEMICOLON");
         case TokenPipe:
             return strdup("PIPE");
+        case TokenAssign:
+            return strdup("ASSIGN");
         default:
             return NULL;
     }
@@ -146,8 +142,6 @@ char *tokenTypeToLiteral(TokenType type) {
         case TokenEof:
             return tokenTypeToString(type);
         case TokenIdent:
-            return tokenTypeToString(type);
-        case TokenChar:
             return tokenTypeToString(type);
         case TokenLParen:
             return strdup("(");
@@ -163,6 +157,8 @@ char *tokenTypeToLiteral(TokenType type) {
             return strdup(";");
         case TokenPipe:
             return strdup("|");
+        case TokenAssign:
+            return strdup("=");
         default:
             return NULL;
     }

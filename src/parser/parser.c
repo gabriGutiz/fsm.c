@@ -18,6 +18,7 @@ int _consumeOptional(Parser *parser, TokenType type);
 void _parseStates(Parser *parser, Automaton *automaton, int (*stateHelper)(Automaton *, char *));
 void _parseAlphabet(Parser *parser, Automaton *automaton);
 void _parseTransitions(Parser *parser, Automaton *automaton);
+void _validateTokenSizeIsOne(Token token, const char *input);
 void _printInputLocation(int line, int col, size_t size, const char *input);
 void _printInputLocationFromToken(Token token, const char *input);
 
@@ -39,7 +40,12 @@ Parser *parserCreate(Token **tokens, char *input) {
 }
 
 Automaton *parserParse(Parser *parser) {
-    Automaton *automaton = automatonCreate();
+    Token name = _consume(parser, TokenIdent);
+    Automaton *automaton = automatonCreate(name.literal);
+
+    _consume(parser, TokenAssign);
+
+    int consumed = _consumeOptional(parser, TokenLParen);
 
     _parseStates(parser, automaton, automatonAddState);
     _consume(parser, TokenSemicolon);
@@ -57,6 +63,10 @@ Automaton *parserParse(Parser *parser) {
 
     _consume(parser, TokenSemicolon);
     _parseStates(parser, automaton, automatonAddAcceptState);
+
+    if (consumed == 1) {
+        _consume(parser, TokenRParen);
+    }
 
     return automaton;
 }
@@ -115,7 +125,9 @@ void _parseAlphabet(Parser *parser, Automaton *automaton) {
     int consumed = _consumeOptional(parser, TokenLSquirly);
 
     do {
-        Token tok = _consume(parser, TokenChar);
+        Token tok = _consume(parser, TokenIdent);
+        _validateTokenSizeIsOne(tok, parser->input);
+
         if (automatonAddToAlphabet(automaton, tok.literal[0]) != 0) {
             _printInputLocationFromToken(tok, parser->input);
             exit(EXIT_FAILURE);
@@ -133,7 +145,7 @@ void _parseTransitions(Parser *parser, Automaton *automaton) {
     do {
         Token from = _consume(parser, TokenIdent);
         _consume(parser, TokenComma);
-        Token c = _consume(parser, TokenChar);
+        Token c = _consume(parser, TokenIdent);
         _consume(parser, TokenComma);
         Token to = _consume(parser, TokenIdent);
 
@@ -157,6 +169,14 @@ void _parseTransitions(Parser *parser, Automaton *automaton) {
 
     if (consumed == 1) {
         _consume(parser, TokenRSquirly);
+    }
+}
+
+void _validateTokenSizeIsOne(Token token, const char *input) {
+    if (token.size > 1) {
+        _printInputLocationFromToken(token, input);
+        fprintf(stderr, "Expected alphabet symbol to be a single character\n");
+        exit(EXIT_FAILURE);
     }
 }
 
