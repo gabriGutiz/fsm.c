@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    Parser *parser = parserCreate(tokens);
+    Parser *parser = parserCreate(tokens, fileContent);
     Automaton *aut = parserParse(parser);
 
     if (automatonCheck(aut, argv[2]) == 1) {

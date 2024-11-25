@@ -8,12 +8,12 @@ extern "C" {
 typedef struct SAutomaton Automaton;
 Automaton *automatonCreate();
 void automatonDestroy(Automaton **automaton);
-void automatonAddState(Automaton *automaton, char *state);
-void automatonAddToAlphabet(Automaton *automaton, char c);
-void automatonAddTransition(Automaton *automaton, char *from, char c, char *to);
+int automatonAddState(Automaton *automaton, char *state);
+int automatonAddToAlphabet(Automaton *automaton, char c);
+int automatonAddTransition(Automaton *automaton, char *from, char c, char *to);
 void automatonValidateTransitions(Automaton *automaton);
-void automatonAddStartState(Automaton *automaton, char *state);
-void automatonAddAcceptState(Automaton *automaton, char *state);
+int automatonAddStartState(Automaton *automaton, char *state);
+int automatonAddAcceptState(Automaton *automaton, char *state);
 int automatonCheck(Automaton *automaton, char *input);
 
 #ifdef __cplusplus

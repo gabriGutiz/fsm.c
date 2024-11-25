@@ -60,45 +60,47 @@ void automatonDestroy(Automaton **automaton) {
     automaton = NULL;
 }
 
-void automatonAddState(Automaton *automaton, char *state) {
+int automatonAddState(Automaton *automaton, char *state) {
     if (automaton->statesCount >= MAX_STATES) {
         fprintf(stderr, "Error max size of states is %d\n", MAX_STATES);
-        exit(EXIT_FAILURE);
+        return 1;
     } else if (_automatonStateExists(automaton, state)) {
         fprintf(stderr, "Error state '%s' is already setted\n", state);
-        exit(EXIT_FAILURE);
+        return 1;
     }
 
     automaton->states[automaton->statesCount] = state;
     automaton->statesCount++;
+    return 0;
 }
 
-void automatonAddToAlphabet(Automaton *automaton, char c) {
+int automatonAddToAlphabet(Automaton *automaton, char c) {
     if (automaton->alphabetCount >= MAX_ALPHABET) {
         fprintf(stderr, "Error max size of alphabet is %d\n", MAX_ALPHABET);
-        exit(EXIT_FAILURE);
+        return 1;
     } else if (_automatonSymbolExists(automaton, c)) {
         fprintf(stderr, "Error symbol '%c' is already in alphabet\n", c);
-        exit(EXIT_FAILURE);
+        return 1;
     }
 
     automaton->alphabet[automaton->alphabetCount] = c;
     automaton->alphabetCount++;
+    return 0;
 }
 
-void automatonAddTransition(Automaton *automaton, char *from, char c, char *to) {
+int automatonAddTransition(Automaton *automaton, char *from, char c, char *to) {
     if (automaton->transitionsCount >= MAX_TRANSITIONS) {
         fprintf(stderr, "Error max size of transitions is %d\n", MAX_TRANSITIONS);
-        exit(EXIT_FAILURE);
+        return 1;
     } else if (!_automatonStateExists(automaton, from)) {
         fprintf(stderr, "Error state '%s' does not exist\n", from);
-        exit(EXIT_FAILURE);
+        return 2; // Error code for error in state from
     } else if (!_automatonSymbolExists(automaton, c)) {
         fprintf(stderr, "Error symbol '%c' does not exist in the alphabet\n", c);
-        exit(EXIT_FAILURE);
+        return 3; // Error code for error in symbol
     } else if (!_automatonStateExists(automaton, to)) {
         fprintf(stderr, "Error state '%s' does not exist\n", to);
-        exit(EXIT_FAILURE);
+        return 4; // Error code for error in state to
     }
 
     Transition t;
@@ -108,6 +110,7 @@ void automatonAddTransition(Automaton *automaton, char *from, char c, char *to) 
 
     automaton->transitions[automaton->transitionsCount] = t;
     automaton->transitionsCount++;
+    return 0;
 }
 
 void automatonValidateTransitions(Automaton *automaton) {
@@ -143,29 +146,32 @@ void automatonValidateTransitions(Automaton *automaton) {
     }
 }
 
-void automatonAddStartState(Automaton *automaton, char *state) {
+int automatonAddStartState(Automaton *automaton, char *state) {
     if (automaton->startState) {
         fprintf(stderr, "Error start state is already setted\n");
-        exit(EXIT_FAILURE);
+        return 1;
     } else if (!_automatonStateExists(automaton, state)) {
         fprintf(stderr, "Error state '%s' does not exist\n", state);
-        exit(EXIT_FAILURE);
+        return 1;
     }
 
     automaton->startState = state;
+    return 0;
 }
 
-void automatonAddAcceptState(Automaton *automaton, char *state) {
+int automatonAddAcceptState(Automaton *automaton, char *state) {
     if (automaton->acceptStatesCount >= MAX_STATES) {
         fprintf(stderr, "Error max size of accept states is %d\n", MAX_STATES);
+        return 1;
         exit(EXIT_FAILURE);
     }else if (!_stringInArray(automaton->states, automaton->statesCount, state)) {
         fprintf(stderr, "Error state '%s' does not exist\n", state);
-        exit(EXIT_FAILURE);
+        return 1;
     }
 
     automaton->acceptStates[automaton->acceptStatesCount] = state;
     automaton->acceptStatesCount++;
+    return 0;
 }
 
 int automatonCheck(Automaton *automaton, char *input) {
