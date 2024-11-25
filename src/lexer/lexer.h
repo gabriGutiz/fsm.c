@@ -21,6 +21,9 @@ typedef enum {
     TokenIllegal
 } TokenType;
 
+char *tokenTypeToString(TokenType type);
+char *tokenTypeToLiteral(TokenType type);
+
 typedef struct SToken {
     TokenType type;
     char *literal;

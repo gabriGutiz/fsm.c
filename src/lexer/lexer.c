@@ -51,7 +51,6 @@ void lexerDestroy(Lexer **lexer) {
     *lexer = NULL;
 }
 
-#include <stdio.h>
 Token *lexerNext(Lexer *lexer) {
     Token *tok = NULL;
 
@@ -109,6 +108,64 @@ Token *lexerNext(Lexer *lexer) {
     _lexerReadChar(lexer);
 
     return tok;
+}
+
+char *tokenTypeToString(TokenType type) {
+    switch (type) {
+        case TokenIllegal:
+            return strdup("ILLEGAL");
+        case TokenEof:
+            return strdup("EOF");
+        case TokenIdent:
+            return strdup("IDENT");
+        case TokenChar:
+            return strdup("CHAR");
+        case TokenLParen:
+            return strdup("LPAREN");
+        case TokenRParen:
+            return strdup("RPAREN");
+        case TokenLSquirly:
+            return strdup("LSQUIRLY");
+        case TokenRSquirly:
+            return strdup("RSQUIRLY");
+        case TokenComma:
+            return strdup("COMMA");
+        case TokenSemicolon:
+            return strdup("SEMICOLON");
+        case TokenPipe:
+            return strdup("PIPE");
+        default:
+            return NULL;
+    }
+}
+
+char *tokenTypeToLiteral(TokenType type) {
+    switch (type) {
+        case TokenIllegal:
+            return tokenTypeToString(type);
+        case TokenEof:
+            return tokenTypeToString(type);
+        case TokenIdent:
+            return tokenTypeToString(type);
+        case TokenChar:
+            return tokenTypeToString(type);
+        case TokenLParen:
+            return strdup("(");
+        case TokenRParen:
+            return strdup(")");
+        case TokenLSquirly:
+            return strdup("{");
+        case TokenRSquirly:
+            return strdup("}");
+        case TokenComma:
+            return strdup(",");
+        case TokenSemicolon:
+            return strdup(";");
+        case TokenPipe:
+            return strdup("|");
+        default:
+            return NULL;
+    }
 }
 
 Token *tokenCreate(TokenType type, char *literal, int line, int column, size_t size) {
