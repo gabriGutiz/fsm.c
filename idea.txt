@@ -1,0 +1,45 @@
+
+------------------- INPUT -------------------
+({s1,s2},{0,1},{(s1,0,s1),(s1,1,s2),(s2,0,s1),(s2,1,s2)},s1,{s2})
+
+0: estados
+1: alfabeto
+2: transições
+3: estado inicial
+4: estados finais
+
+s1,s2;0,1;s1,0,s1|s1,1,s2|s2,0,s1|s2,1,s2;s1;s2
+
+------------------- TOKENS -------------------
+
+LPAREN: '('
+RPAREN: ')'
+LSQUIRLY: '{'
+RSQUIRLY: '}'
+COMMA: ','
+SEMICOLON: ';'
+PIPE: ';'
+EOF: '\0'
+
+CHAR: +
+STATE: [s|q][0-9]+
+WS: [ \t\r\n]+
+
+------------------- GRAMMAR -------------------
+
+start: states SEMICOLON alpha SEMICOLON transitions SEMICOLON STATE SEMICOLON states EOF
+
+states: LSQUIRLY state_list RSQUIRLY | state_list
+
+state_list: STATE (COMMA STATE)*
+
+alpha: LSQUIRLY alpha_list RSQUIRLY | alpha_list
+
+alpha_list: CHAR (COMMA CHAR)*
+
+transitions: LSQUIRLY trans_list RSQUIRLY | trans_list
+
+trans_list: transdef (PIPE transdef)*
+
+transdef: STATE COMA CHAR COMA STATE
+
