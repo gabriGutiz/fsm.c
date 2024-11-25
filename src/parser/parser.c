@@ -166,6 +166,9 @@ void _printInputLocation(int line, int col, size_t size, const char *input) {
     int lineCounter = 0, lastNewLine = 0, startIndex = 0, index = 0;
     do {
         if (input[index] == '\n' || input[index] == '\0' || input[index] == '\r') {
+            if (input[lastNewLine] == '\n') {
+                lastNewLine++;
+            }
             startIndex = lastNewLine;
             lastNewLine = index;
             lineCounter++;
@@ -179,8 +182,8 @@ void _printInputLocation(int line, int col, size_t size, const char *input) {
         fprintf(stderr, "Error allocating memory\n");
         exit(EXIT_FAILURE);
     }
-    memset(lineStr, 0, i);
-    strncpy(lineStr, input + startIndex, i - 1);
+    memset(lineStr, 0, i + 1);
+    strncpy(lineStr, input + startIndex, i);
     fprintf(stderr, "%s\n", lineStr);
 
     for (int i = 0; i < col - 1; i++) {
