@@ -87,8 +87,8 @@ Token _consume(Parser *parser, TokenType type) {
     Token token = _getToken(parser);
 
     if (token.type != type) {
+        fprintf(stderr, "\nExpected token type '%s', got '%s'\n\n", tokenTypeToLiteral(type), tokenTypeToLiteral(token.type));
         _printInputLocationFromToken(token, parser->input);
-        fprintf(stderr, "Expected token type '%s', got '%s'\n", tokenTypeToLiteral(type), tokenTypeToLiteral(token.type));
         exit(EXIT_FAILURE);
     }
     parser->position++;
@@ -174,8 +174,8 @@ void _parseTransitions(Parser *parser, Automaton *automaton) {
 
 void _validateTokenSizeIsOne(Token token, const char *input) {
     if (token.size > 1) {
+        fprintf(stderr, "\nExpected alphabet symbol to be a single character\n\n");
         _printInputLocationFromToken(token, input);
-        fprintf(stderr, "Expected alphabet symbol to be a single character\n");
         exit(EXIT_FAILURE);
     }
 }

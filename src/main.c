@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
 
     parserDestroy(&parser);
     automatonDestroy(&aut);
+    free(tokens);
 
     return EXIT_SUCCESS;
 }
