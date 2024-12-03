@@ -95,7 +95,7 @@ Token _getToken(Parser *parser) {
 Token _consume(Parser *parser, TokenType type) {
     Token token = _getToken(parser);
     if (token.type != type) {
-        fprintf(stderr, "\nExpected token type '%s', got '%s'\n\n", tokenTypeToLiteral(type), tokenTypeToLiteral(token.type));
+        fprintf(stderr, "Expected token type '%s', got '%s'\n", tokenTypeToLiteral(type), tokenTypeToLiteral(token.type));
         _printInputLocationFromToken(token, lexerGetInput(parser->lexer));
         exit(EXIT_FAILURE);
     }
@@ -188,14 +188,14 @@ void _parseTransitions(Parser *parser, Automaton *automaton) {
 
 void _validateTokenSizeIsOne(Token token, const char *input) {
     if (token.size > 1) {
-        fprintf(stderr, "\nExpected alphabet symbol to be a single character\n\n");
+        fprintf(stderr, "Expected alphabet symbol to be a single character\n");
         _printInputLocationFromToken(token, input);
         exit(EXIT_FAILURE);
     }
 }
 
 void _printInputLocation(int line, int col, size_t size, const char *input) {
-    fprintf(stderr, "Error at line %d:%d\n", line, col);
+    fprintf(stderr, "\nError at line %d:%d\n", line, col);
 
     int lineCounter = 0, lastNewLine = 0, startIndex = 0, index = 0;
     do {
