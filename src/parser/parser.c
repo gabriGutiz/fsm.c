@@ -72,6 +72,15 @@ Automaton *parserParse(Parser *parser) {
 }
 
 void parserDestroy(Parser **parser) {
+    if (*parser && (*parser)->currentToken) {
+        tokenDestroy(&(*parser)->currentToken);
+    }
+
+    if (*parser) {
+        free(*parser);
+    }
+
+    *parser = NULL;
 }
 
 /*****************************************************************************
