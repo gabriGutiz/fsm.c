@@ -9,7 +9,7 @@ extern "C" {
 #include "../automaton/automaton.h"
 
 typedef struct SParser Parser;
-Parser *parserCreate(Token **tokens, char *input);
+Parser *parserCreate(Lexer *lexer);
 Automaton *parserParse(Parser *parser);
 void parserDestroy(Parser **parser);
 

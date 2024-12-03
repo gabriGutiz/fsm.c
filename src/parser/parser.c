@@ -7,12 +7,10 @@
 #include "../automaton/automaton.h"
 
 struct SParser {
-    const char *input;
-    const Token **tokens;
-    size_t position;
+    Lexer *lexer;
+    Token *currentToken;
 };
 
-Token _getToken(Parser *parser);
 Token _consume(Parser *parser, TokenType type);
 int _consumeOptional(Parser *parser, TokenType type);
 void _parseStates(Parser *parser, Automaton *automaton, int (*stateHelper)(Automaton *, char *));
@@ -26,16 +24,12 @@ void _printInputLocationFromToken(Token token, const char *input);
 *                              PUBLIC FUNCTIONS                              *
 ******************************************************************************/
 
-Parser *parserCreate(Token **tokens, char *input) {
+Parser *parserCreate(Lexer *lexer) {
     size_t len = sizeof(Parser);
-
     Parser *parser = malloc(len);
     memset(parser, 0, len);
-
-    parser->tokens = tokens;
-    parser->input = input;
-    parser->position = 0;
-
+    parser->lexer = lexer;
+    parser->currentToken = NULL;
     return parser;
 }
 
@@ -57,7 +51,7 @@ Automaton *parserParse(Parser *parser) {
 
     Token start = _consume(parser, TokenIdent);
     if (automatonAddStartState(automaton, start.literal) != 0) {
-        _printInputLocationFromToken(start, parser->input);
+        _printInputLocationFromToken(start, lexerGetInput(parser->lexer));
         exit(EXIT_FAILURE);
     }
 
@@ -88,29 +82,40 @@ void parserDestroy(Parser **parser) {
 ******************************************************************************/
 
 Token _getToken(Parser *parser) {
-    Token tok = *parser->tokens[parser->position];
-    return tok;
+    if (parser->currentToken == NULL) {
+        return *lexerNext(parser->lexer);
+    } else {
+        Token token = *parser->currentToken;
+        free(parser->currentToken);
+        parser->currentToken = NULL;
+        return token;
+    }
 }
 
 Token _consume(Parser *parser, TokenType type) {
     Token token = _getToken(parser);
-
     if (token.type != type) {
         fprintf(stderr, "\nExpected token type '%s', got '%s'\n\n", tokenTypeToLiteral(type), tokenTypeToLiteral(token.type));
-        _printInputLocationFromToken(token, parser->input);
+        _printInputLocationFromToken(token, lexerGetInput(parser->lexer));
         exit(EXIT_FAILURE);
     }
-    parser->position++;
     return token;
 }
 
 int _consumeOptional(Parser *parser, TokenType type) {
     Token token = _getToken(parser);
-
     if (token.type == type) {
-        parser->position++;
         return 1;
     }
+    
+    Token *tok;
+    if (!(tok = (Token *)malloc(sizeof(Token)))) {
+        fprintf(stderr, "Error allocating memory\n");
+        exit(EXIT_FAILURE);
+    }
+    (*tok) = token;
+    parser->currentToken = tok;
+
     return 0;
 }
 
@@ -120,7 +125,7 @@ void _parseStates(Parser *parser, Automaton *automaton, int (*stateHandler)(Auto
     do {
         Token tok = _consume(parser, TokenIdent);
         if (stateHandler(automaton, tok.literal) != 0) {
-            _printInputLocationFromToken(tok, parser->input);
+            _printInputLocationFromToken(tok, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         }
     } while (_consumeOptional(parser, TokenComma));
@@ -135,10 +140,10 @@ void _parseAlphabet(Parser *parser, Automaton *automaton) {
 
     do {
         Token tok = _consume(parser, TokenIdent);
-        _validateTokenSizeIsOne(tok, parser->input);
+        _validateTokenSizeIsOne(tok, lexerGetInput(parser->lexer));
 
         if (automatonAddToAlphabet(automaton, tok.literal[0]) != 0) {
-            _printInputLocationFromToken(tok, parser->input);
+            _printInputLocationFromToken(tok, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         }
     } while (_consumeOptional(parser, TokenComma));
@@ -161,16 +166,16 @@ void _parseTransitions(Parser *parser, Automaton *automaton) {
         int res = automatonAddTransition(automaton, from.literal, c.literal[0], to.literal);
 
         if (res == 2) {
-            _printInputLocationFromToken(from, parser->input);
+            _printInputLocationFromToken(from, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         } else if (res == 3) {
-            _printInputLocationFromToken(c, parser->input);
+            _printInputLocationFromToken(c, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         } else if (res == 4) {
-            _printInputLocationFromToken(to, parser->input);
+            _printInputLocationFromToken(to, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         } else if (res != 0) {
-            _printInputLocation(from.line, from.column, from.size + c.size + to.size + 2, parser->input);
+            _printInputLocation(from.line, from.column, from.size + c.size + to.size + 2, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         }
 

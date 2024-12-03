@@ -6,12 +6,10 @@
 #include "automaton/automaton.h"
 
 char *readFile(const char *filename);
-Token **tokenize(char *input, size_t *size);
 
 int main(int argc, char *argv[]) {
     char *fileContent;
     size_t totalTokens = 0;
-    Token **tokens;
 
     if (argc < 3) {
         fprintf(stderr, "Usage: %s <filename> <test_string>\n", argv[0]);
@@ -21,12 +19,9 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Error reading file or file is empty");
         return EXIT_FAILURE;
     }
-    if (!(tokens = tokenize(fileContent, &totalTokens))) {
-        fprintf(stderr, "Error tokenizing file content");
-        return EXIT_FAILURE;
-    }
 
-    Parser *parser = parserCreate(tokens, fileContent);
+    Lexer *lexer = lexerCreate(fileContent);
+    Parser *parser = parserCreate(lexer);
     Automaton *aut = parserParse(parser);
 
     if (automatonCheck(aut, argv[2]) == 1) {
@@ -35,9 +30,9 @@ int main(int argc, char *argv[]) {
         printf("String '%s' is NOT accepted by automaton %s\n", argv[2], automatonGetName(aut));
     }
 
+    lexerDestroy(&lexer);
     parserDestroy(&parser);
     automatonDestroy(&aut);
-    free(tokens);
 
     return EXIT_SUCCESS;
 }
@@ -62,50 +57,4 @@ char *readFile(const char *filename) {
     fclose(file);
 
     return buffer;
-}
-
-Token **tokenize(char *input, size_t *size) {
-    Lexer *lexer = NULL;
-    Token **tokens = NULL, **tmp = NULL;
-    size_t currSize = 40;
-
-    lexer = lexerCreate(input);
-    *size = 0;
-
-    if (!(tokens = (Token **)malloc(currSize * sizeof(Token *)))) {
-        fprintf(stderr, "Error allocating memory for tokens");
-        exit(EXIT_FAILURE);
-    }
-
-    do {
-        if (*size > currSize) {
-            currSize *= 2;
-            if (!(tmp = (Token **)realloc(tokens, currSize * sizeof(Token *)))) {
-                for (size_t i = 0; i < currSize; i++) {
-                    tokenDestroy(tokens + i);
-                }
-                free(tokens);
-                fprintf(stderr, "Error reallocating memory for tokens");
-                exit(EXIT_FAILURE);
-            }
-            tokens = tmp;
-        }
-
-        tokens[*size] = lexerNext(lexer);
-        (*size)++;
-    } while (tokens[*size - 1]->type != TokenEof);
-
-    lexerDestroy(&lexer);
-
-    if (!(tmp = (Token **)realloc(tokens, *size * sizeof(Token *)))) {
-        for (size_t i = 0; i < *size; i++) {
-            tokenDestroy(tokens + i);
-        }
-        free(tokens);
-        fprintf(stderr, "Error reallocating memory for tokens");
-        exit(EXIT_FAILURE);
-    }
-    tokens = tmp;
-
-    return tokens;
 }

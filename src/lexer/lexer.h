@@ -36,6 +36,7 @@ typedef struct SLexer Lexer;
 Lexer *lexerCreate(const char *input);
 
 Token *lexerNext(Lexer *lexer);
+const char *lexerGetInput(Lexer *lexer);
 void lexerDestroy(Lexer **lexer);
 
 Token *tokenCreate(TokenType type, char *literal, int line, int column, size_t size);

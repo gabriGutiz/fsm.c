@@ -106,6 +106,10 @@ Token *lexerNext(Lexer *lexer) {
     return tok;
 }
 
+const char *lexerGetInput(Lexer *lexer) {
+    return lexer->input;
+}
+
 char *tokenTypeToString(TokenType type) {
     switch (type) {
         case TokenIllegal:
