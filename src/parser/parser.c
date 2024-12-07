@@ -4,7 +4,7 @@
 
 #include "parser.h"
 #include "../lexer/lexer.h"
-#include "../automaton/automaton.h"
+#include "../fsm/fsm.h"
 
 struct SParser {
     Lexer *lexer;
@@ -13,9 +13,9 @@ struct SParser {
 
 Token _consume(Parser *parser, TokenType type);
 int _consumeOptional(Parser *parser, TokenType type);
-void _parseStates(Parser *parser, Automaton *automaton, int (*stateHelper)(Automaton *, char *));
-void _parseAlphabet(Parser *parser, Automaton *automaton);
-void _parseTransitions(Parser *parser, Automaton *automaton);
+void _parseStates(Parser *parser, Fsm *fsm, int (*stateHelper)(Fsm *, char *));
+void _parseAlphabet(Parser *parser, Fsm *fsm);
+void _parseTransitions(Parser *parser, Fsm *fsm);
 void _validateTokenSizeIsOne(Token token, const char *input);
 void _printInputLocation(int line, int col, size_t size, const char *input);
 void _printInputLocationFromToken(Token token, const char *input);
@@ -33,36 +33,36 @@ Parser *parserCreate(Lexer *lexer) {
     return parser;
 }
 
-Automaton *parserParse(Parser *parser) {
+Fsm *parserParse(Parser *parser) {
     Token name = _consume(parser, TK_IDENT);
-    Automaton *automaton = automatonCreate(name.literal);
+    Fsm *fsm = fsmCreate(name.literal);
 
     _consume(parser, TK_ASSIGN);
 
     int consumed = _consumeOptional(parser, TK_LPAREN);
 
-    _parseStates(parser, automaton, automatonAddState);
+    _parseStates(parser, fsm, fsmAddState);
     _consume(parser, TK_SEMICOLON);
-    _parseAlphabet(parser, automaton);
+    _parseAlphabet(parser, fsm);
     _consume(parser, TK_SEMICOLON);
-    _parseTransitions(parser, automaton);
-    automatonValidateTransitions(automaton);
+    _parseTransitions(parser, fsm);
+    fsmValidateTransitions(fsm);
     _consume(parser, TK_SEMICOLON);
 
     Token start = _consume(parser, TK_IDENT);
-    if (automatonAddStartState(automaton, start.literal) != 0) {
+    if (fsmAddStartState(fsm, start.literal) != 0) {
         _printInputLocationFromToken(start, lexerGetInput(parser->lexer));
         exit(EXIT_FAILURE);
     }
 
     _consume(parser, TK_SEMICOLON);
-    _parseStates(parser, automaton, automatonAddAcceptState);
+    _parseStates(parser, fsm, fsmAddAcceptState);
 
     if (consumed == 1) {
         _consume(parser, TK_RPAREN);
     }
 
-    return automaton;
+    return fsm;
 }
 
 void parserDestroy(Parser **parser) {
@@ -119,12 +119,12 @@ int _consumeOptional(Parser *parser, TokenType type) {
     return 0;
 }
 
-void _parseStates(Parser *parser, Automaton *automaton, int (*stateHandler)(Automaton *, char *)) {
+void _parseStates(Parser *parser, Fsm *fsm, int (*stateHandler)(Fsm *, char *)) {
     int consumed = _consumeOptional(parser, TK_LSQUIRLY);
 
     do {
         Token tok = _consume(parser, TK_IDENT);
-        if (stateHandler(automaton, tok.literal) != 0) {
+        if (stateHandler(fsm, tok.literal) != 0) {
             _printInputLocationFromToken(tok, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         }
@@ -135,14 +135,14 @@ void _parseStates(Parser *parser, Automaton *automaton, int (*stateHandler)(Auto
     }
 }
 
-void _parseAlphabet(Parser *parser, Automaton *automaton) {
+void _parseAlphabet(Parser *parser, Fsm *fsm) {
     int consumed = _consumeOptional(parser, TK_LSQUIRLY);
 
     do {
         Token tok = _consume(parser, TK_IDENT);
         _validateTokenSizeIsOne(tok, lexerGetInput(parser->lexer));
 
-        if (automatonAddToAlphabet(automaton, tok.literal[0]) != 0) {
+        if (fsmAddToAlphabet(fsm, tok.literal[0]) != 0) {
             _printInputLocationFromToken(tok, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         }
@@ -153,7 +153,7 @@ void _parseAlphabet(Parser *parser, Automaton *automaton) {
     }
 }
 
-void _parseTransitions(Parser *parser, Automaton *automaton) {
+void _parseTransitions(Parser *parser, Fsm *fsm) {
     int consumed = _consumeOptional(parser, TK_LSQUIRLY);
 
     do {
@@ -163,7 +163,7 @@ void _parseTransitions(Parser *parser, Automaton *automaton) {
         _consume(parser, TK_COMMA);
         Token to = _consume(parser, TK_IDENT);
 
-        int res = automatonAddTransition(automaton, from.literal, c.literal[0], to.literal);
+        int res = fsmAddTransition(fsm, from.literal, c.literal[0], to.literal);
 
         if (res == 2) {
             _printInputLocationFromToken(from, lexerGetInput(parser->lexer));

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
-project(AutomatonCompiler)
+project(fsm)
 
-set(This AutomatonCompiler)
+set(This fsm)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -9,13 +9,13 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(Headers
   src/lexer/lexer.h
   src/parser/parser.h
-  src/automaton/automaton.h
+  src/fsm/fsm.h
 )
 
 set(Sources
   src/lexer/lexer.c
   src/parser/parser.c
-  src/automaton/automaton.c
+  src/fsm/fsm.c
 )
 
 enable_testing()

@@ -3,7 +3,7 @@
 
 #include "lexer/lexer.h"
 #include "parser/parser.h"
-#include "automaton/automaton.h"
+#include "fsm/fsm.h"
 
 char *readFile(const char *filename);
 
@@ -22,17 +22,17 @@ int main(int argc, char *argv[]) {
 
     Lexer *lexer = lexerCreate(fileContent);
     Parser *parser = parserCreate(lexer);
-    Automaton *aut = parserParse(parser);
+    Fsm *fsm = parserParse(parser);
 
-    if (automatonCheck(aut, argv[2]) == 1) {
-        printf("String '%s' is accepted by automaton %s\n", argv[2], automatonGetName(aut));
+    if (fsmCheck(fsm, argv[2]) == 1) {
+        printf("String '%s' is accepted by FSM %s\n", argv[2], fsmGetName(fsm));
     } else {
-        printf("String '%s' is NOT accepted by automaton %s\n", argv[2], automatonGetName(aut));
+        printf("String '%s' is NOT accepted by FSM %s\n", argv[2], fsmGetName(fsm));
     }
 
     lexerDestroy(&lexer);
     parserDestroy(&parser);
-    automatonDestroy(&aut);
+    fsmDestroy(&fsm);
 
     return EXIT_SUCCESS;
 }

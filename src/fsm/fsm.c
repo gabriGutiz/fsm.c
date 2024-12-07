@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "automaton.h"
+#include "fsm.h"
 
 #define MAX_STATES 256
 #define MAX_ALPHABET 36
@@ -14,7 +14,7 @@ typedef struct STransition {
     char *to;
 } Transition;
 
-struct SAutomaton {
+struct SFsm {
     char *name;
     char *states[MAX_STATES];
     size_t statesCount;
@@ -29,82 +29,82 @@ struct SAutomaton {
 
 int _stringInArray(char *array[], size_t size, char *value);
 int _charInArray(char array[], size_t size, char value);
-int _automatonStateExists(Automaton *automaton, char *state);
-int _automatonSymbolExists(Automaton *automaton, char c);
-char *_automatonGetNextState(Automaton *automaton, char *state, char c);
-int _automatonCountTransitions(Automaton *automaton, char *state, char c);
+int _fsmStateExists(Fsm *fsm, char *state);
+int _fsmSymbolExists(Fsm *fsm, char c);
+char *_fsmGetNextState(Fsm *fsm, char *state, char c);
+int _fsmCountTransitions(Fsm *fsm, char *state, char c);
 
 /*****************************************************************************
 *                              PUBLIC FUNCTIONS                              *
 ******************************************************************************/
 
-Automaton *automatonCreate(char *name) {
-    size_t len = sizeof(Automaton);
+Fsm *fsmCreate(char *name) {
+    size_t len = sizeof(Fsm);
 
-    Automaton *automaton = malloc(len);
-    memset(automaton, 0, len);
+    Fsm *fsm = malloc(len);
+    memset(fsm, 0, len);
 
-    automaton->name = name;
-    automaton->statesCount = 0;
-    automaton->alphabetCount = 0;
-    automaton->transitionsCount = 0;
-    automaton->startState = NULL;
-    automaton->acceptStatesCount = 0;
+    fsm->name = name;
+    fsm->statesCount = 0;
+    fsm->alphabetCount = 0;
+    fsm->transitionsCount = 0;
+    fsm->startState = NULL;
+    fsm->acceptStatesCount = 0;
 
-    return automaton;
+    return fsm;
 }
 
-char *automatonGetName(Automaton *automaton) {
-    return automaton->name;
+char *fsmGetName(Fsm *fsm) {
+    return fsm->name;
 }
 
-void automatonDestroy(Automaton **automaton) {
-    if (*automaton) {
-        free(*automaton);
+void fsmDestroy(Fsm **fsm) {
+    if (*fsm) {
+        free(*fsm);
     }
 
-    automaton = NULL;
+    fsm = NULL;
 }
 
-int automatonAddState(Automaton *automaton, char *state) {
-    if (automaton->statesCount >= MAX_STATES) {
+int fsmAddState(Fsm *fsm, char *state) {
+    if (fsm->statesCount >= MAX_STATES) {
         fprintf(stderr, "Error max size of states is %d\n", MAX_STATES);
         return 1;
-    } else if (_automatonStateExists(automaton, state)) {
+    } else if (_fsmStateExists(fsm, state)) {
         fprintf(stderr, "Error state '%s' is already setted\n", state);
         return 1;
     }
 
-    automaton->states[automaton->statesCount] = state;
-    automaton->statesCount++;
+    fsm->states[fsm->statesCount] = state;
+    fsm->statesCount++;
     return 0;
 }
 
-int automatonAddToAlphabet(Automaton *automaton, char c) {
-    if (automaton->alphabetCount >= MAX_ALPHABET) {
+int fsmAddToAlphabet(Fsm *fsm, char c) {
+    if (fsm->alphabetCount >= MAX_ALPHABET) {
         fprintf(stderr, "Error max size of alphabet is %d\n", MAX_ALPHABET);
         return 1;
-    } else if (_automatonSymbolExists(automaton, c)) {
+    } else if (_fsmSymbolExists(fsm, c)) {
         fprintf(stderr, "Error symbol '%c' is already in alphabet\n", c);
         return 1;
     }
 
-    automaton->alphabet[automaton->alphabetCount] = c;
-    automaton->alphabetCount++;
+    fsm->alphabet[fsm->alphabetCount] = c;
+    fsm->alphabetCount++;
     return 0;
 }
 
-int automatonAddTransition(Automaton *automaton, char *from, char c, char *to) {
-    if (automaton->transitionsCount >= MAX_TRANSITIONS) {
+int fsmAddTransition(Fsm *fsm, char *from, char c, char *to) {
+    if (fsm->transitionsCount >= MAX_TRANSITIONS) {
         fprintf(stderr, "Error max size of transitions is %d\n", MAX_TRANSITIONS);
         return 1;
-    } else if (!_automatonStateExists(automaton, from)) {
+    } else if (!_fsmStateExists(fsm, from)) {
         fprintf(stderr, "Error state '%s' does not exist\n", from);
         return 2; // Error code for error in state from
-    } else if (!_automatonSymbolExists(automaton, c)) {
+    } else if (!_fsmSymbolExists(fsm, c)) {
         fprintf(stderr, "Error symbol '%c' does not exist in the alphabet\n", c);
         return 3; // Error code for error in symbol
-    } else if (!_automatonStateExists(automaton, to)) {
+    } else if (!_fsmStateExists(fsm, to)) {
         fprintf(stderr, "Error state '%s' does not exist\n", to);
         return 4; // Error code for error in state to
     }
@@ -114,18 +114,18 @@ int automatonAddTransition(Automaton *automaton, char *from, char c, char *to) {
     t.c = c;
     t.to = to;
 
-    automaton->transitions[automaton->transitionsCount] = t;
-    automaton->transitionsCount++;
+    fsm->transitions[fsm->transitionsCount] = t;
+    fsm->transitionsCount++;
     return 0;
 }
 
-void automatonValidateTransitions(Automaton *automaton) {
-    for (size_t i = 0; i < automaton->statesCount; i++) {
-        char *state = automaton->states[i];
+void fsmValidateTransitions(Fsm *fsm) {
+    for (size_t i = 0; i < fsm->statesCount; i++) {
+        char *state = fsm->states[i];
 
-        for (size_t j = 0; j < automaton->alphabetCount; j++) {
-            char c = automaton->alphabet[j];
-            int totalTransitions = _automatonCountTransitions(automaton, state, c);
+        for (size_t j = 0; j < fsm->alphabetCount; j++) {
+            char c = fsm->alphabet[j];
+            int totalTransitions = _fsmCountTransitions(fsm, state, c);
 
             if (totalTransitions < 1) {
                 fprintf(stderr, "Error transition from state '%s' with symbol '%c' does not exist\n", state, c);
@@ -137,8 +137,8 @@ void automatonValidateTransitions(Automaton *automaton) {
         }
 
         int found = 0;
-        for (size_t i = 0; i < automaton->transitionsCount; i++) {
-            Transition t = automaton->transitions[i];
+        for (size_t i = 0; i < fsm->transitionsCount; i++) {
+            Transition t = fsm->transitions[i];
 
             if (strcmp(t.to, state) == 0) {
                 found = 1;
@@ -152,51 +152,51 @@ void automatonValidateTransitions(Automaton *automaton) {
     }
 }
 
-int automatonAddStartState(Automaton *automaton, char *state) {
-    if (automaton->startState) {
+int fsmAddStartState(Fsm *fsm, char *state) {
+    if (fsm->startState) {
         fprintf(stderr, "Error start state is already setted\n");
         return 1;
-    } else if (!_automatonStateExists(automaton, state)) {
+    } else if (!_fsmStateExists(fsm, state)) {
         fprintf(stderr, "Error state '%s' does not exist\n", state);
         return 1;
     }
 
-    automaton->startState = state;
+    fsm->startState = state;
     return 0;
 }
 
-int automatonAddAcceptState(Automaton *automaton, char *state) {
-    if (automaton->acceptStatesCount >= MAX_STATES) {
+int fsmAddAcceptState(Fsm *fsm, char *state) {
+    if (fsm->acceptStatesCount >= MAX_STATES) {
         fprintf(stderr, "Error max size of accept states is %d\n", MAX_STATES);
         return 1;
         exit(EXIT_FAILURE);
-    }else if (!_stringInArray(automaton->states, automaton->statesCount, state)) {
+    }else if (!_stringInArray(fsm->states, fsm->statesCount, state)) {
         fprintf(stderr, "Error state '%s' does not exist\n", state);
         return 1;
     }
 
-    automaton->acceptStates[automaton->acceptStatesCount] = state;
-    automaton->acceptStatesCount++;
+    fsm->acceptStates[fsm->acceptStatesCount] = state;
+    fsm->acceptStatesCount++;
     return 0;
 }
 
-int automatonCheck(Automaton *automaton, char *input) {
-    char *state = automaton->startState;
+int fsmCheck(Fsm *fsm, char *input) {
+    char *state = fsm->startState;
 
     for (size_t i = 0; i < strlen(input); i++) {
         char c = input[i];
         char *nextState;
 
-        if (!_charInArray(automaton->alphabet, automaton->alphabetCount, c)) {
+        if (!_charInArray(fsm->alphabet, fsm->alphabetCount, c)) {
             return 0;
-        } else if (!(nextState = _automatonGetNextState(automaton, state, c))) {
+        } else if (!(nextState = _fsmGetNextState(fsm, state, c))) {
             return 0;
         }
 
         state = nextState;
     }
 
-    return _stringInArray(automaton->acceptStates, automaton->acceptStatesCount, state);
+    return _stringInArray(fsm->acceptStates, fsm->acceptStatesCount, state);
 }
 
 /*****************************************************************************
@@ -223,17 +223,17 @@ int _charInArray(char array[], size_t size, char value) {
     return 0;
 }
 
-int _automatonStateExists(Automaton *automaton, char *state) {
-    return _stringInArray(automaton->states, automaton->statesCount, state);
+int _fsmStateExists(Fsm *fsm, char *state) {
+    return _stringInArray(fsm->states, fsm->statesCount, state);
 }
 
-int _automatonSymbolExists(Automaton *automaton, char c) {
-    return _charInArray(automaton->alphabet, automaton->alphabetCount, c);
+int _fsmSymbolExists(Fsm *fsm, char c) {
+    return _charInArray(fsm->alphabet, fsm->alphabetCount, c);
 }
 
-char *_automatonGetNextState(Automaton *automaton, char *state, char c) {
-    for (size_t i = 0; i < automaton->transitionsCount; i++) {
-        Transition t = automaton->transitions[i];
+char *_fsmGetNextState(Fsm *fsm, char *state, char c) {
+    for (size_t i = 0; i < fsm->transitionsCount; i++) {
+        Transition t = fsm->transitions[i];
 
         if (strcmp(t.from, state) == 0 && t.c == c) {
             return t.to;
@@ -243,11 +243,11 @@ char *_automatonGetNextState(Automaton *automaton, char *state, char c) {
     return NULL;
 }
 
-int _automatonCountTransitions(Automaton *automaton, char *state, char c) {
+int _fsmCountTransitions(Fsm *fsm, char *state, char c) {
     int total = 0;
 
-    for (size_t i = 0; i < automaton->transitionsCount; i++) {
-        Transition t = automaton->transitions[i];
+    for (size_t i = 0; i < fsm->transitionsCount; i++) {
+        Transition t = fsm->transitions[i];
 
         if (strcmp(t.from, state) == 0 && t.c == c) {
             total++;

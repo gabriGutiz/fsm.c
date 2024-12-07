@@ -14,15 +14,15 @@ add_executable(lexer_test lexer_test.cpp)
 target_link_libraries(lexer_test
  PRIVATE
   GTest::GTest
-  AutomatonCompiler_lib)
+  fsm_lib)
 
 add_test(NAME lexer_test COMMAND lexer_test)
 
-add_executable(automaton_test automaton_test.cpp)
+add_executable(fsm_test fsm_test.cpp)
 
-target_link_libraries(automaton_test
+target_link_libraries(fsm_test
  PRIVATE
   GTest::GTest
-  AutomatonCompiler_lib)
+  fsm_lib)
 
-add_test(NAME automaton_test COMMAND automaton_test)
+add_test(NAME fsm_test COMMAND fsm_test)

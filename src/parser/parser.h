@@ -6,11 +6,11 @@ extern "C" {
 #endif
 
 #include "../lexer/lexer.h"
-#include "../automaton/automaton.h"
+#include "../fsm/fsm.h"
 
 typedef struct SParser Parser;
 Parser *parserCreate(Lexer *lexer);
-Automaton *parserParse(Parser *parser);
+Fsm *parserParse(Parser *parser);
 void parserDestroy(Parser **parser);
 
 #ifdef __cplusplus
