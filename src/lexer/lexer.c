@@ -14,6 +14,12 @@ struct SLexer {
     char ch;
 };
 
+/* ORDER RESERVED */
+static const char *const TokenTypeLiterals [] = {
+    "(", ")", "{", "}", ",", ";", "|",
+    "=", "<ident>", "<EOF>", "<illegal>"
+};
+
 static void _lexerReadChar(Lexer *lexer);
 static void _lexerSkipWhitespace(Lexer *lexer);
 static const char *_lexerReadIdent(Lexer *lexer, size_t *len);
@@ -58,31 +64,31 @@ Token *lexerNext(Lexer *lexer) {
 
     switch (lexer->ch) {
         case '(':
-            tok = tokenCreate(TokenLParen, NULL, lexer->line, lexer->column, 1);
+            tok = tokenCreate(TK_LPAREN, NULL, lexer->line, lexer->column, 1);
             break;
         case ')':
-            tok = tokenCreate(TokenRParen, NULL, lexer->line, lexer->column, 1);
+            tok = tokenCreate(TK_RPAREN, NULL, lexer->line, lexer->column, 1);
             break;
         case '{':
-            tok = tokenCreate(TokenLSquirly, NULL, lexer->line, lexer->column, 1);
+            tok = tokenCreate(TK_LSQUIRLY, NULL, lexer->line, lexer->column, 1);
             break;
         case '}':
-            tok = tokenCreate(TokenRSquirly, NULL, lexer->line, lexer->column, 1);
+            tok = tokenCreate(TK_RSQUIRLY, NULL, lexer->line, lexer->column, 1);
             break;
         case ',':
-            tok = tokenCreate(TokenComma, NULL, lexer->line, lexer->column, 1);
+            tok = tokenCreate(TK_COMMA, NULL, lexer->line, lexer->column, 1);
             break;
         case ';':
-            tok = tokenCreate(TokenSemicolon, NULL, lexer->line, lexer->column, 1);
+            tok = tokenCreate(TK_SEMICOLON, NULL, lexer->line, lexer->column, 1);
             break;
         case '|':
-            tok = tokenCreate(TokenPipe, NULL, lexer->line, lexer->column, 1);
+            tok = tokenCreate(TK_PIPE, NULL, lexer->line, lexer->column, 1);
             break;
         case '=':
-            tok = tokenCreate(TokenAssign, NULL, lexer->line, lexer->column, 1);
+            tok = tokenCreate(TK_ASSIGN, NULL, lexer->line, lexer->column, 1);
             break;
         case '\0':
-            tok = tokenCreate(TokenEof, NULL, lexer->line, lexer->column, 1);
+            tok = tokenCreate(TK_EOF, NULL, lexer->line, lexer->column, 1);
             break;
     }
 
@@ -93,12 +99,12 @@ Token *lexerNext(Lexer *lexer) {
 
         literal = strndup(ident, len);
 
-        tok = tokenCreate(TokenIdent, literal, lexer->line, lexer->column - len, len);
+        tok = tokenCreate(TK_IDENT, literal, lexer->line, lexer->column - len, len);
         return tok;
     }
 
     if (!tok) {
-        tok = tokenCreate(TokenIllegal, NULL, lexer->line, lexer->column, 1);
+        tok = tokenCreate(TK_ILLEGAL, NULL, lexer->line, lexer->column, 1);
     }
 
     _lexerReadChar(lexer);
@@ -110,62 +116,8 @@ const char *lexerGetInput(Lexer *lexer) {
     return lexer->input;
 }
 
-char *tokenTypeToString(TokenType type) {
-    switch (type) {
-        case TokenIllegal:
-            return strdup("ILLEGAL");
-        case TokenEof:
-            return strdup("EOF");
-        case TokenIdent:
-            return strdup("IDENT");
-        case TokenLParen:
-            return strdup("LPAREN");
-        case TokenRParen:
-            return strdup("RPAREN");
-        case TokenLSquirly:
-            return strdup("LSQUIRLY");
-        case TokenRSquirly:
-            return strdup("RSQUIRLY");
-        case TokenComma:
-            return strdup("COMMA");
-        case TokenSemicolon:
-            return strdup("SEMICOLON");
-        case TokenPipe:
-            return strdup("PIPE");
-        case TokenAssign:
-            return strdup("ASSIGN");
-        default:
-            return NULL;
-    }
-}
-
-char *tokenTypeToLiteral(TokenType type) {
-    switch (type) {
-        case TokenIllegal:
-            return tokenTypeToString(type);
-        case TokenEof:
-            return tokenTypeToString(type);
-        case TokenIdent:
-            return tokenTypeToString(type);
-        case TokenLParen:
-            return strdup("(");
-        case TokenRParen:
-            return strdup(")");
-        case TokenLSquirly:
-            return strdup("{");
-        case TokenRSquirly:
-            return strdup("}");
-        case TokenComma:
-            return strdup(",");
-        case TokenSemicolon:
-            return strdup(";");
-        case TokenPipe:
-            return strdup("|");
-        case TokenAssign:
-            return strdup("=");
-        default:
-            return NULL;
-    }
+const char *tokenTypeToLiteral(TokenType type) {
+    return TokenTypeLiterals[type];
 }
 
 Token *tokenCreate(TokenType type, char *literal, int line, int column, size_t size) {

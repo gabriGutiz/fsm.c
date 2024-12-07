@@ -34,32 +34,32 @@ Parser *parserCreate(Lexer *lexer) {
 }
 
 Automaton *parserParse(Parser *parser) {
-    Token name = _consume(parser, TokenIdent);
+    Token name = _consume(parser, TK_IDENT);
     Automaton *automaton = automatonCreate(name.literal);
 
-    _consume(parser, TokenAssign);
+    _consume(parser, TK_ASSIGN);
 
-    int consumed = _consumeOptional(parser, TokenLParen);
+    int consumed = _consumeOptional(parser, TK_LPAREN);
 
     _parseStates(parser, automaton, automatonAddState);
-    _consume(parser, TokenSemicolon);
+    _consume(parser, TK_SEMICOLON);
     _parseAlphabet(parser, automaton);
-    _consume(parser, TokenSemicolon);
+    _consume(parser, TK_SEMICOLON);
     _parseTransitions(parser, automaton);
     automatonValidateTransitions(automaton);
-    _consume(parser, TokenSemicolon);
+    _consume(parser, TK_SEMICOLON);
 
-    Token start = _consume(parser, TokenIdent);
+    Token start = _consume(parser, TK_IDENT);
     if (automatonAddStartState(automaton, start.literal) != 0) {
         _printInputLocationFromToken(start, lexerGetInput(parser->lexer));
         exit(EXIT_FAILURE);
     }
 
-    _consume(parser, TokenSemicolon);
+    _consume(parser, TK_SEMICOLON);
     _parseStates(parser, automaton, automatonAddAcceptState);
 
     if (consumed == 1) {
-        _consume(parser, TokenRParen);
+        _consume(parser, TK_RPAREN);
     }
 
     return automaton;
@@ -120,48 +120,48 @@ int _consumeOptional(Parser *parser, TokenType type) {
 }
 
 void _parseStates(Parser *parser, Automaton *automaton, int (*stateHandler)(Automaton *, char *)) {
-    int consumed = _consumeOptional(parser, TokenLSquirly);
+    int consumed = _consumeOptional(parser, TK_LSQUIRLY);
 
     do {
-        Token tok = _consume(parser, TokenIdent);
+        Token tok = _consume(parser, TK_IDENT);
         if (stateHandler(automaton, tok.literal) != 0) {
             _printInputLocationFromToken(tok, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         }
-    } while (_consumeOptional(parser, TokenComma));
+    } while (_consumeOptional(parser, TK_COMMA));
 
     if (consumed == 1) {
-        _consume(parser, TokenRSquirly);
+        _consume(parser, TK_RSQUIRLY);
     }
 }
 
 void _parseAlphabet(Parser *parser, Automaton *automaton) {
-    int consumed = _consumeOptional(parser, TokenLSquirly);
+    int consumed = _consumeOptional(parser, TK_LSQUIRLY);
 
     do {
-        Token tok = _consume(parser, TokenIdent);
+        Token tok = _consume(parser, TK_IDENT);
         _validateTokenSizeIsOne(tok, lexerGetInput(parser->lexer));
 
         if (automatonAddToAlphabet(automaton, tok.literal[0]) != 0) {
             _printInputLocationFromToken(tok, lexerGetInput(parser->lexer));
             exit(EXIT_FAILURE);
         }
-    } while (_consumeOptional(parser, TokenComma));
+    } while (_consumeOptional(parser, TK_COMMA));
 
     if (consumed == 1) {
-        _consume(parser, TokenRSquirly);
+        _consume(parser, TK_RSQUIRLY);
     }
 }
 
 void _parseTransitions(Parser *parser, Automaton *automaton) {
-    int consumed = _consumeOptional(parser, TokenLSquirly);
+    int consumed = _consumeOptional(parser, TK_LSQUIRLY);
 
     do {
-        Token from = _consume(parser, TokenIdent);
-        _consume(parser, TokenComma);
-        Token c = _consume(parser, TokenIdent);
-        _consume(parser, TokenComma);
-        Token to = _consume(parser, TokenIdent);
+        Token from = _consume(parser, TK_IDENT);
+        _consume(parser, TK_COMMA);
+        Token c = _consume(parser, TK_IDENT);
+        _consume(parser, TK_COMMA);
+        Token to = _consume(parser, TK_IDENT);
 
         int res = automatonAddTransition(automaton, from.literal, c.literal[0], to.literal);
 
@@ -179,10 +179,10 @@ void _parseTransitions(Parser *parser, Automaton *automaton) {
             exit(EXIT_FAILURE);
         }
 
-    } while (_consumeOptional(parser, TokenPipe));
+    } while (_consumeOptional(parser, TK_PIPE));
 
     if (consumed == 1) {
-        _consume(parser, TokenRSquirly);
+        _consume(parser, TK_RSQUIRLY);
     }
 }
 

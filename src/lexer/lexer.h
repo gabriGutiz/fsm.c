@@ -7,22 +7,25 @@ extern "C" {
 
 #include <stdlib.h>
 
+/*
+* WARNING: if you change the order of this enumeration,
+* grep -rn "ORDER RESERVED" ./src
+*/
 typedef enum {
-    TokenLParen,
-    TokenRParen,
-    TokenLSquirly,
-    TokenRSquirly,
-    TokenComma,
-    TokenSemicolon,
-    TokenPipe,
-    TokenIdent,
-    TokenAssign,
-    TokenEof,
-    TokenIllegal
+    TK_LPAREN,
+    TK_RPAREN,
+    TK_LSQUIRLY,
+    TK_RSQUIRLY,
+    TK_COMMA,
+    TK_SEMICOLON,
+    TK_PIPE,
+    TK_ASSIGN,
+    TK_IDENT,
+    TK_EOF,
+    TK_ILLEGAL
 } TokenType;
 
-char *tokenTypeToString(TokenType type);
-char *tokenTypeToLiteral(TokenType type);
+const char *tokenTypeToLiteral(TokenType type);
 
 typedef struct SToken {
     TokenType type;
